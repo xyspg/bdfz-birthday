@@ -20,20 +20,33 @@ const QueryForm = () => {
   const [birthday, setBirthday] = React.useState("");
   const [result, setResult] = React.useState<QueryResult>();
 
+  /**
+   * 限制生日输入框只能输入数字和
+   * 自动添加 `-` 符号
+   * 如果是删除操作，忽略逻辑
+   * @param e
+   */
   const onBirthdayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputVal = e.target.value;
-    const lastChar = inputVal.charAt(inputVal.length - 1);
 
-    if (isNaN(Number(lastChar)) && lastChar !== "-") {
-      return;
+    //@ts-expect-error
+    const isDeletion = e.nativeEvent.inputType === 'deleteContentBackward' || e.nativeEvent.inputType === 'deleteContentForward';
+
+    if (!isDeletion) {
+      const lastChar = inputVal.charAt(inputVal.length - 1);
+      if (isNaN(Number(lastChar))) {
+        return;
+      }
     }
 
-    if (inputVal.length === 4 || inputVal.length === 7) {
+    if (!isDeletion && (inputVal.length === 4 || inputVal.length === 7)) {
       setBirthday(inputVal + "-");
     } else {
       setBirthday(inputVal);
     }
   };
+
+
   const { toast } = useToast()
 
   const fetchData = async () => {
