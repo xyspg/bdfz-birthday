@@ -1,12 +1,7 @@
 ---
-import Footer from "@/components/layout/footer.astro";
-import Header from "@/components/layout/header.astro";
-import { MainNavigationMenu } from "@/components/main-navigation-menu";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import BaseLayout from "./base-layout.astro";
-import { SheetMobileNav } from "@/components/layout/sheet-mobile-nav";
-import { navMenuConfig } from "@/config/nav-menu";
+
 // import { marketingConfig } from "@/config/marketing";
 // import MainNav from "@/components/layout/main-nav.astro";
 
@@ -16,14 +11,14 @@ type Props = {
   mainClass?: string;
 };
 
-const { title, description, mainClass } = Astro.props;
+const {title, description, mainClass} = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
 
 
-  <main class={cn(mainClass)}>
-    <slot />
-  </main>
+    <main class={cn(mainClass)}>
+        <slot/>
+    </main>
 
 </BaseLayout>

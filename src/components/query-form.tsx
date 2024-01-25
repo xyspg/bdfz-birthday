@@ -89,7 +89,7 @@ const QueryForm = () => {
             onClick={fetchData}
             className={cn(buttonVariants({ size: "lg" }))}
           >
-            Get Started
+            Check
           </button>
         </div>
       </div>
