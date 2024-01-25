@@ -57,7 +57,7 @@ const QueryForm = () => {
       <Toaster />
       <div className="flex flex-col mb-12">
         <div className='flex flex-col items-center gap-5 text-center mb-8'>
-          <span className="w-64 flex flex-col gap-2 justify-start">
+          <span className="px-8 md:px-0 w-full md:w-64 flex flex-col gap-2 justify-start">
             <Input
               placeholder="姓名"
               value={name}

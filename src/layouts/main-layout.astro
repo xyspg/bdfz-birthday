@@ -15,10 +15,7 @@ const {title, description, mainClass} = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-
-
     <main class={cn(mainClass)}>
         <slot/>
     </main>
-
 </BaseLayout>
