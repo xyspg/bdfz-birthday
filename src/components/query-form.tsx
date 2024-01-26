@@ -127,10 +127,10 @@ const QueryForm = () => {
             {result.result.map((person) => (
               <div key={person.name} className="relative overflow-hidden w-full rounded-lg border bg-background p-2">
                 <div className="flex h-[180px] flex-col justify-between rounded-md p-5">
-                  <h1 className='text-4xl font-extrabold'>{`20${person.usin}届`}</h1>
+                  <h1 className='text-4xl font-extrabold'>{person.name}</h1>
 
                   <div className="space-y-2">
-                    <h3 className="font-bold">{person.name}</h3>
+                    <h3 className="font-bold">{`20${person.usin}届`}</h3>
                     <p className="text-sm text-muted-foreground">
                       {person.birthday}
                     </p>

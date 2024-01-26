@@ -1,27 +1,32 @@
 import type { APIRoute } from "astro";
 import { db } from "../../../drizzle";
-import {bdfzBirthdayLog, chalkData} from "../../../drizzle/schema.ts";
+import { bdfzBirthdayLog, chalkData } from "../../../drizzle/schema.ts";
 import { eq, and, like, not } from "drizzle-orm";
 import { ratelimit } from "@/lib/redis.ts";
+import * as process from "process";
+const isProd = import.meta.env.PROD;
 
 export const POST: APIRoute = async ({ request }) => {
-  const ip = getIP(request)
+  const ip = getIP(request);
 
-  const { success } = await ratelimit.limit(`birthday:query:${ip ?? ''}`)
+  const { success } = await ratelimit.limit(`birthday:query:${ip ?? ""}`);
 
   if (!success) {
-    return new Response(JSON.stringify({
-      message: "请求过于频繁，请稍后再试"
-    }), {
-      status: 429,
-    })
+    return new Response(
+      JSON.stringify({
+        message: "请求过于频繁，请稍后再试",
+      }),
+      {
+        status: 429,
+      },
+    );
   }
   /**
    * Statistics
    */
-  const headers = request.headers
-  const userAgent = headers.get('user-agent') ?? ''
-  const referer = headers.get('referer') ?? ''
+  const headers = request.headers;
+  const userAgent = headers.get("user-agent") ?? "";
+  const referer = headers.get("referer") ?? "";
 
   const body = await request.json();
   const { name, birthday: studentId } = body;
@@ -36,17 +41,16 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-
   const person = await db.query.chalkData.findFirst({
     columns: {
       name: true,
       birthday: true,
-      usin: true
+      usin: true,
     },
     where: eq(chalkData.name, name),
   });
 
-  if (!person) {
+  if (!person && isProd) {
     await db.insert(bdfzBirthdayLog).values({
       name,
       birthday: studentId,
@@ -54,8 +58,8 @@ export const POST: APIRoute = async ({ request }) => {
       userAgent,
       ip: ip as string,
       referer,
-      statusCode: 404
-    })
+      statusCode: 404,
+    });
     return new Response(
       JSON.stringify({
         message: "您的名字不存在",
@@ -66,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  if (person.usin !== studentId) {
+  if (person?.usin !== studentId && isProd) {
     await db.insert(bdfzBirthdayLog).values({
       name,
       birthday: studentId,
@@ -74,8 +78,8 @@ export const POST: APIRoute = async ({ request }) => {
       userAgent,
       ip: ip as string,
       referer,
-      statusCode: 401
-    })
+      statusCode: 401,
+    });
     return new Response(
       JSON.stringify({
         message: "请输入正确的学号",
@@ -86,11 +90,12 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const birthdayToQuery = person.birthday;
+  const birthdayToQuery = person?.birthday;
   if (birthdayToQuery === null) {
     return new Response(
       JSON.stringify({
-        message: "Failed to match the corresponding entry. This is an extremely weird error.",
+        message:
+          "Failed to match the corresponding entry. This is an extremely weird error.",
       }),
       {
         status: 500,
@@ -105,23 +110,22 @@ export const POST: APIRoute = async ({ request }) => {
       birthday: true,
     },
     where: and(
-      like(chalkData.birthday, `%${birthdayToQuery.substring(5)}`),
+      like(chalkData.birthday, `%${birthdayToQuery?.substring(5)}`),
       not(eq(chalkData.name, name)),
     ),
   });
 
-
-
-  await db.insert(bdfzBirthdayLog).values({
-    name,
-    birthday: studentId,
-    result,
-    userAgent,
-    ip: ip as string,
-    referer,
-    statusCode: 200
-  })
-
+  if (isProd) {
+    await db.insert(bdfzBirthdayLog).values({
+      name,
+      birthday: studentId,
+      result,
+      userAgent,
+      ip: ip as string,
+      referer,
+      statusCode: 200,
+    });
+  }
   return new Response(
     JSON.stringify({
       message: "ok",
@@ -132,15 +136,15 @@ export const POST: APIRoute = async ({ request }) => {
     }),
   );
 };
- function getIP(request: Request) {
-  if ('ip' in request && request.ip) {
-    return request.ip
+function getIP(request: Request) {
+  if ("ip" in request && request.ip) {
+    return request.ip;
   }
 
-  const xff = request.headers.get('x-forwarded-for')
-  if (xff === '::1') {
-    return '127.0.0.1'
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff === "::1") {
+    return "127.0.0.1";
   }
 
-  return xff?.split(',')?.[0] ?? '127.0.0.1'
+  return xff?.split(",")?.[0] ?? "127.0.0.1";
 }
