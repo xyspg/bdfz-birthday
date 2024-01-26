@@ -114,7 +114,7 @@ const QueryForm = () => {
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-              在北大附中，有{result?.result.length}个人和你同生日
+              在北大附中，有{result?.result.length}个人和你同一天生日
             </h2>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7 balance-text">
               著名的「生日问题」是问最少需要多少人，当中两人同一天生日的概率才会过半。答案是23人，所以在30人的小学班级中两人同生日的概率更高。对于60人或更多人，概率大于99%。
