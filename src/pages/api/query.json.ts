@@ -24,11 +24,11 @@ export const POST: APIRoute = async ({ request }) => {
   const referer = headers.get('referer') ?? ''
 
   const body = await request.json();
-  const { name, birthday } = body;
+  const { name, birthday: studentId } = body;
   if (!name || !body) {
     return new Response(
       JSON.stringify({
-        message: "姓名或生日不能为空",
+        message: "姓名或学号不能为空",
       }),
       {
         status: 400,
@@ -41,6 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     columns: {
       name: true,
       birthday: true,
+      usin: true
     },
     where: eq(chalkData.name, name),
   });
@@ -48,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!person) {
     await db.insert(bdfzBirthdayLog).values({
       name,
-      birthday,
+      birthday: studentId,
       result: null,
       userAgent,
       ip: ip as string,
@@ -65,10 +66,10 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  if (person.birthday !== birthday) {
+  if (person.usin !== studentId) {
     await db.insert(bdfzBirthdayLog).values({
       name,
-      birthday,
+      birthday: studentId,
       result: null,
       userAgent,
       ip: ip as string,
@@ -77,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
     })
     return new Response(
       JSON.stringify({
-        message: "请输入正确的生日",
+        message: "请输入正确的学号",
       }),
       {
         status: 401,
@@ -113,7 +114,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   await db.insert(bdfzBirthdayLog).values({
     name,
-    birthday,
+    birthday: studentId,
     result,
     userAgent,
     ip: ip as string,

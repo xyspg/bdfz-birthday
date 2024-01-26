@@ -84,10 +84,12 @@ const QueryForm = () => {
               }}
             />
             <Input
-              placeholder="生日 (yyyy-mm-dd)"
+              placeholder="学号"
               value={birthday}
-              onChange={onBirthdayChange}
-              maxLength={10}
+              onChange={(e: React.ChangeEvent<HTMLInputElement> ) => {
+                setBirthday(e.target.value)
+              }}
+              maxLength={7}
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === "Enter") {
                   fetchData();
