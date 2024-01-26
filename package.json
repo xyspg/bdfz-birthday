@@ -26,6 +26,8 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "@upstash/ratelimit": "^1.0.0",
+    "@upstash/redis": "^1.28.2",
     "astro": "^4.0.6",
     "astro-icon": "^0.8.2",
     "balance-text": "^3.3.1",

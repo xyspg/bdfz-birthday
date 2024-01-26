@@ -1,9 +1,28 @@
 import type { APIRoute } from "astro";
 import { db } from "../../../drizzle";
-import { chalkData } from "../../../drizzle/schema.ts";
-import {eq, and, like, not} from "drizzle-orm";
+import {bdfzBirthdayLog, chalkData} from "../../../drizzle/schema.ts";
+import { eq, and, like, not } from "drizzle-orm";
+import { ratelimit } from "@/lib/redis.ts";
 
 export const POST: APIRoute = async ({ request }) => {
+  const ip = getIP(request)
+
+  const { success } = await ratelimit.limit(`birthday:query:${ip ?? ''}`)
+
+  if (!success) {
+    return new Response(JSON.stringify({
+      message: "请求过于频繁，请稍后再试"
+    }), {
+      status: 429,
+    })
+  }
+  /**
+   * Statistics
+   */
+  const headers = request.headers
+  const userAgent = headers.get('user-agent') ?? ''
+  const referer = headers.get('referer') ?? ''
+
   const body = await request.json();
   const { name, birthday } = body;
   if (!name || !body) {
@@ -16,6 +35,8 @@ export const POST: APIRoute = async ({ request }) => {
       },
     );
   }
+
+
   const person = await db.query.chalkData.findFirst({
     columns: {
       name: true,
@@ -25,6 +46,15 @@ export const POST: APIRoute = async ({ request }) => {
   });
 
   if (!person) {
+    await db.insert(bdfzBirthdayLog).values({
+      name,
+      birthday,
+      result: null,
+      userAgent,
+      ip: ip as string,
+      referer,
+      statusCode: 404
+    })
     return new Response(
       JSON.stringify({
         message: "您的名字不存在",
@@ -36,6 +66,15 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (person.birthday !== birthday) {
+    await db.insert(bdfzBirthdayLog).values({
+      name,
+      birthday,
+      result: null,
+      userAgent,
+      ip: ip as string,
+      referer,
+      statusCode: 401
+    })
     return new Response(
       JSON.stringify({
         message: "请输入正确的生日",
@@ -50,14 +89,13 @@ export const POST: APIRoute = async ({ request }) => {
   if (birthdayToQuery === null) {
     return new Response(
       JSON.stringify({
-        message: "未找到有效的生日",
+        message: "Failed to match the corresponding entry. This is an extremely weird error.",
       }),
       {
-        status: 404,
+        status: 500,
       },
     );
   }
-
 
   const result = await db.query.chalkData.findMany({
     columns: {
@@ -65,13 +103,43 @@ export const POST: APIRoute = async ({ request }) => {
       name: true,
       birthday: true,
     },
-    where: and(like(chalkData.birthday, `%${birthdayToQuery.substring(5)}`), not(eq(chalkData.name, name))),
+    where: and(
+      like(chalkData.birthday, `%${birthdayToQuery.substring(5)}`),
+      not(eq(chalkData.name, name)),
+    ),
   });
+
+
+
+  await db.insert(bdfzBirthdayLog).values({
+    name,
+    birthday,
+    result,
+    userAgent,
+    ip: ip as string,
+    referer,
+    statusCode: 200
+  })
 
   return new Response(
     JSON.stringify({
       message: "ok",
-      result: result.map( item => ({ ...item, usin: item.usin.substring(0,2)}))
-    })
+      result: result.map((item) => ({
+        ...item,
+        usin: item.usin.substring(0, 2),
+      })),
+    }),
   );
 };
+ function getIP(request: Request) {
+  if ('ip' in request && request.ip) {
+    return request.ip
+  }
+
+  const xff = request.headers.get('x-forwarded-for')
+  if (xff === '::1') {
+    return '127.0.0.1'
+  }
+
+  return xff?.split(',')?.[0] ?? '127.0.0.1'
+}

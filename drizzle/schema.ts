@@ -37,3 +37,20 @@ export const chalkData = mysqlTable("chalk_data", {
 			usin: unique("usin").on(table.usin),
 		}
 	});
+
+export const bdfzBirthdayLog = mysqlTable("bdfz_birthday_log", {
+		id: int("id").autoincrement().notNull(),
+		timestamp: datetime("timestamp", { mode: 'string'}),
+		name: varchar("name", { length: 255 }),
+		birthday: varchar("birthday", { length: 255 }),
+		result: json("result"),
+		userAgent: varchar("user_agent", { length: 255 }),
+		ip: varchar("ip", { length: 255 }),
+		referer: varchar("referer", { length: 255 }),
+		statusCode: int("status_code"),
+	},
+	(table) => {
+		return {
+			bdfzBirthdayLogId: primaryKey({ columns: [table.id], name: "bdfz_birthday_log_id"}),
+		}
+	});

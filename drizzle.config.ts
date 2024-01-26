@@ -4,10 +4,10 @@ export default {
   out: "./drizzle",
   driver: "mysql2",
   dbCredentials: {
-    host: process.env["DATABASE_HOST"]!,
-    user: process.env["DATABASE_USERNAME"]!,
-    password: process.env["DATABASE_PASSWORD"]!,
-    database: process.env["DATABASE_NAME"]!,
+    host: import.meta.env["DATABASE_HOST"]!,
+    user: import.meta.env["DATABASE_USERNAME"]!,
+    password: import.meta.env["DATABASE_PASSWORD"]!,
+    database: import.meta.env["DATABASE_NAME"]!,
   }
 
 
