@@ -65,6 +65,7 @@ const QueryForm = () => {
     if (response.message !== "ok") {
       console.error(response.message);
       toast({variant: "destructive", title: "发生了错误...", description: response.message})
+      setLoading(false)
       return
     }
     setResult(response);
