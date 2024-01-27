@@ -19,6 +19,7 @@ const QueryForm = () => {
   const [name, setName] = React.useState("");
   const [birthday, setBirthday] = React.useState("");
   const [result, setResult] = React.useState<QueryResult>();
+  const [loading, setLoading] = React.useState(false);
 
   /**
    * 限制生日输入框只能输入数字和
@@ -50,6 +51,10 @@ const QueryForm = () => {
   const { toast } = useToast()
 
   const fetchData = async () => {
+    if (loading) {
+      return;
+    }
+    setLoading(true)
     const response = await fetch("/api/query.json", {
       method: "POST",
       body: JSON.stringify({
@@ -63,6 +68,7 @@ const QueryForm = () => {
       return
     }
     setResult(response);
+    setLoading(false)
   };
 
   return (
@@ -102,9 +108,10 @@ const QueryForm = () => {
         <div className="flex justify-center space-x-2 md:space-x-4">
           <button
             onClick={fetchData}
+            disabled={loading}
             className={cn(buttonVariants({ size: "lg" }))}
           >
-            Check
+            {loading ? "Loading" : "Check"}
           </button>
         </div>
       </div>
