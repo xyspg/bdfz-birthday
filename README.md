@@ -1,7 +1,5 @@
-# Astronomy
-
-An open source application built using the latest features in Astro v4 with shadcn/ui.
-
+# BDFZ Birthday
+Check your birthday
 
 > **Warning**
 > This app is a work in progress. I'm building this in public. You can follow the progress on Twitter [@miickasmt](https://twitter.com/miickasmt).
