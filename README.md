@@ -2,38 +2,10 @@
 Check your birthday
 
 > **Warning**
-> This app is a work in progress. I'm building this in public. You can follow the progress on Twitter [@miickasmt](https://twitter.com/miickasmt).
-> See the roadmap below.
-
+> This app is a work in progress. I'm building this in public. 
 ## About this project
+This project use the public available data from chalk to index your birthday with people that has the same birthday with you (year insensitive) 
 
-This project as an experiment to see how a modern app (with features like authentication, subscriptions, API routes, Markdown, Content Collections ...etc) would work in Astro v4 and shadcn/ui.
-
-> **Note**
-> I would like to inform you that for the time being, my example app built with Astro.js is still under development and **cannot yet be considered a starter template**.
-
-## Project Structure
-
-```
-├── public/
-│   └── fonts/
-├── src/
-│   ├── components/
-│   ├── config/
-│   ├── content/
-│   ├── hooks/
-│   ├── icons/
-│   ├── layouts/
-│   ├── lib/
-│   ├── pages/
-│   ├── styles/
-│   └── types/
-├── astro.config.mjs
-├── README.md
-├── package.json
-├── tailwind.config.cjs
-└── tsconfig.json
-```
 
 ## Features
 
